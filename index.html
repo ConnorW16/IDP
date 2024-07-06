@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDP Front End</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="fullbox" id="TitleBox">Odin Database</div>
+    <div class="fullbox" id="InformationBox">Please use the boxes below to select the table you wold like to search, as well as any details you would like to filter by.</div>
+
+    <div class="fullbox" id="filtercontrols">
+        <form>
+            <!-- Initial selection for filtering data -->
+            <label for="tablefilter">Choose a table to retrieve data from:</label>
+            <select id="tablefilterbox" name="tablefilter" onchange="tableCheck()">
+                <option selected disabled>Choose a selection:</option>
+                <option id="patientselect" value="Patient">Patient</option>
+                <option id="locationselect" value="Locations">Locations</option>
+                <option id="appointmentselect" value="Appointments">Appointments</option>
+            </select>
+            <br></br>
+            <!-- Filter boxes for patient selection -->
+            <label id="sexfilterlabel" for="sexfilter" style="display: none;">Choose a sex to filter the data: </label>
+            <select id="sexfilterbox" name="sexfilter" style="display: none;" onchange="sexCheck()">
+                <option selected disabled>Choose a sex:</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <br></br>
+            <label id="allergyfilterlabel" for="allergyfilter" style="display: none;">Choose an allergy to filter the data: </label>
+            <select id="allergyfilterbox" name="allergyfilter" style="display: none;" onchange="allergyCheck()">
+                <option selected disabled>Choose an allergy:</option>
+                <option value="Animals">Animals</option>
+                <option value="Food">Food</option>
+                <option value="Hay Fever">Hay Fever</option>
+            </select>
+            <br></br>
+            <!-- Filter box for location selection -->
+            <label id="locationtypefilterlabel" for="locationtypefilterbox" style="display: none;">Choose the type of location to filter the data: </label>
+            <select id="locationtypefilterbox" name="locationtype filter" style="display: none;" onchange="locationtypeCheck()">
+                <option selected disabled>Choose a location type:</option>
+                <option value="Clinic">Clinic</option>
+                <option value="Hospital">Hospital</option>
+                <option value="Pharmacy">Pharmacy</option>
+            </select>
+            <br></br>
+            <!-- Filter boxes for appointment selection -->
+            <label id="appointmentlocationfilterlabel" for="appointmentlocationfilter" style="display: none;">Choose the appointment location to filter the data: </label>
+            <select id="appointmentlocationfilterbox" name="appointmentlocation filter" style="display: none;" onchange="appointmentlocationCheck()">
+                <option selected disabled>Choose a location:</option>
+                <option value="1">Hawthorn Health Center</option>
+                <option value="2">Prairie Rose Family Practice</option>
+                <option value="3">Sunnyvale Medical Clinic</option>
+            </select>
+            <br></br>
+        </form>
+    </div>
+
+    <div>
+        <button id="getPatients" onclick="searchPatients()" style="display: none;">Get</button>
+        <button id="getLocation" onclick="searchLocations()" style="display: none;">Get</button>
+        <button id="getAppointments" onclick="searchAppointments()" style="display: none;">Get</button>
+    </div>
+
+    <div class="responseTime" id="databaseResponseTime">Database Response Time: </div>
+
+    <div class="grid-container" id=".grid-container"></div>
+
+    <script>
+        function tableCheck(){
+            tableoutput = document.getElementById("tablefilterbox");
+            var selectedText = tableoutput.options[tableoutput.selectedIndex].text;
+            console.log(selectedText);
+            switch (selectedText){
+                case "Patient":
+                    document.getElementById("locationtypefilterlabel").style.display="none";
+                    document.getElementById("locationtypefilterbox").style.display="none";
+                    document.getElementById("appointmentlocationfilterlabel").style.display="none";
+                    document.getElementById("appointmentlocationfilterbox").style.display="none";
+                    document.getElementById("getLocation").style.display="none";
+                    document.getElementById("getAppointments").style.display="none";
+
+                    document.getElementById("sexfilterlabel").style.display="block";
+                    document.getElementById("sexfilterbox").style.display="block";
+                    document.getElementById("allergyfilterlabel").style.display="block";
+                    document.getElementById("allergyfilterbox").style.display="block";
+                    document.getElementById("getPatients").style.display="block";
+                    break;
+                case "Locations":
+                    document.getElementById("sexfilterlabel").style.display="none";
+                    document.getElementById("sexfilterbox").style.display="none";
+                    document.getElementById("allergyfilterlabel").style.display="none";
+                    document.getElementById("allergyfilterbox").style.display="none";
+                    document.getElementById("appointmentlocationfilterlabel").style.display="none";
+                    document.getElementById("appointmentlocationfilterbox").style.display="none";
+                    document.getElementById("getAppointments").style.display="none";
+                    document.getElementById("getPatients").style.display="none";
+
+                    document.getElementById("locationtypefilterlabel").style.display="block";
+                    document.getElementById("locationtypefilterbox").style.display="block";
+                    document.getElementById("getLocation").style.display="block";
+                    break;
+                case "Appointments":
+                    document.getElementById("sexfilterlabel").style.display="none";
+                    document.getElementById("sexfilterbox").style.display="none";
+                    document.getElementById("allergyfilterlabel").style.display="none";
+                    document.getElementById("allergyfilterbox").style.display="none";
+                    document.getElementById("locationtypefilterlabel").style.display="none";
+                    document.getElementById("locationtypefilterbox").style.display="none";
+                    document.getElementById("getLocation").style.display="none";
+                    document.getElementById("getPatients").style.display="none";
+
+                    document.getElementById("appointmentlocationfilterlabel").style.display="block";
+                    document.getElementById("appointmentlocationfilterbox").style.display="block";
+                    document.getElementById("getAppointments").style.display="block";
+                    break;
+                default:
+                    console.log("w-w-w whats goin on? *queue crazy frog*")
+            }
+        }
+        function sexCheck(){
+            tableoutput = document.getElementById("sexfilterbox");
+            var selectedSex = tableoutput.options[tableoutput.selectedIndex].text;
+            //console.log(selectedSex);
+            return selectedSex;
+        }
+        function allergyCheck(){
+            tableoutput = document.getElementById("allergyfilterbox");
+            var selectedAllergy = tableoutput.options[tableoutput.selectedIndex].text;
+            //console.log(selectedAllergy);
+            return selectedAllergy;
+        }
+        function locationtypeCheck(){
+            tableoutput = document.getElementById("locationtypefilterbox");
+            var selectedLocationType = tableoutput.options[tableoutput.selectedIndex].text;
+            //console.log(selectedLocationType);
+            return selectedLocationType;
+        }
+        function appointmentlocationCheck(){
+            tableoutput = document.getElementById("appointmentlocationfilterbox");
+            var selectedAppointmentLocation = tableoutput.options[tableoutput.selectedIndex].text;
+            //console.log(selectedAppointmentLocation);
+            return selectedAppointmentLocation;
+        }
+
+        async function searchPatients(){
+            var startTime = performance.now();
+            document.getElementById("databaseResponseTime").innerHTML = "Database Response Time: ";
+            document.getElementById(".grid-container").innerHTML=""
+            const type = sexCheck();
+            const type2 = allergyCheck();
+            console.log(type);
+            console.log(type2);
+            const categoryEndpointFilter =  "'" + type + "'";
+            const categoryEndpointFilter2 =  " and Patient_Allergies eq '" + type2 + "'";
+            const endpoint = `/data-api/rest/Patient?$filter=Patient_Sex eq `;
+            const response = await fetch(`${endpoint}${categoryEndpointFilter}${categoryEndpointFilter2}`);
+            const result = await response.json();
+            //console.table(result.value);
+            var endTime = performance.now();
+            var totalResponseTime = endTime - startTime;
+            //console.log(totalResponseTime);
+            document.getElementById("databaseResponseTime").innerHTML += totalResponseTime.toFixed() + " miliseconds.";
+            valueLength = result.value.length;
+            valueLength += 1;
+            for (let i = 1; i < valueLength; i++){
+                const gridContainer = document.querySelector('.grid-container');
+                const table = document.createElement('table');
+                gridContainer.append(table);
+        
+                table.classList.add("table" + (i));
+                table.id = 'itable';
+                table.innerHTML = "<tr><th>Field</th><th>Data</th></tr>";
+            }
+            valueLength2 = result.value.length;
+            for (let i2 = 0; i2 < valueLength2; i2++){
+                item = result.value[i2];
+                console.log(item);
+                var tablecontainer = document.querySelector('.table' + (i2 += 1));
+                id = item.Patient_ID;
+                tablecontainer.innerHTML += "<tr><td>Patient ID</td><td>"+id+"</td></tr>";
+                fname = item.Patient_FirstName;
+                tablecontainer.innerHTML += "<tr><td>First Name</td><td>"+fname+"</td></tr>";
+                lname = item.Patient_LastName;
+                tablecontainer.innerHTML += "<tr><td>Last Name</td><td>"+lname+"</td></tr>";
+                sex = item.Patient_Sex;
+                tablecontainer.innerHTML += "<tr><td>Sex</td><td>"+sex+"</td></tr>";
+                dob = item.Patient_DoB;
+                tablecontainer.innerHTML += "<tr><td>Date of Birth</td><td>"+dob+"</td></tr>";
+                email = item.Patient_Email;
+                tablecontainer.innerHTML += "<tr><td>Email</td><td>"+email+"</td></tr>";
+                htele = item.Patient_HomeTelephone;
+                tablecontainer.innerHTML += "<tr><td>Home Telephone</td><td>"+htele+"</td></tr>";
+                mtele = item.Patient_MobileNumber;
+                tablecontainer.innerHTML += "<tr><td>Mobile Phone Number</td><td>"+mtele+"</td></tr>";
+                address = item.Patient_Address;
+                tablecontainer.innerHTML += "<tr><td>Address</td><td>"+address+"</td></tr>";
+                city = item.Patient_City;
+                tablecontainer.innerHTML += "<tr><td>City</td><td>"+city+"</td></tr>";
+                country = item.Patient_Country;
+                tablecontainer.innerHTML += "<tr><td>Country</td><td>"+country+"</td></tr>";
+                postcode = item.Patient_Postcode;
+                tablecontainer.innerHTML += "<tr><td>Postcode</td><td>"+postcode+"</td></tr>";
+                allergies = item.Patient_Allergies;
+                tablecontainer.innerHTML += "<tr><td>Allergies</td><td>"+allergies+"</td></tr>";
+                econtactname = item.Patient_EmergencyContactName;
+                tablecontainer.innerHTML += "<tr><td>Emergency Contact Name</td><td>"+econtactname+"</td></tr>";
+                econtactnumber = item.Patient_EmergencyContactNumber;
+                tablecontainer.innerHTML += "<tr><td>Emergency Contact Number</td><td>"+econtactnumber+"</td></tr>";
+                notes = item.Patient_Notes;
+                tablecontainer.innerHTML += "<tr><td>Notes</td><td>"+notes+"</td></tr>";
+                i2 -=1;
+            }
+        }
+        async function searchLocations(){
+            var startTime = performance.now();
+            document.getElementById("databaseResponseTime").innerHTML = "Database Response Time: ";
+            document.getElementById(".grid-container").innerHTML=""
+            const type = locationtypeCheck();
+            console.log(type);
+            const categoryEndpointFilter =  "'" + type + "'";
+            const endpoint = `/data-api/rest/Location?$filter=Location_Type eq `;
+            const response = await fetch(`${endpoint}${categoryEndpointFilter}`);
+            const result = await response.json();
+            //console.table(result.value);
+            var endTime = performance.now();
+            var totalResponseTime = endTime - startTime;
+            //console.log(totalResponseTime);
+            document.getElementById("databaseResponseTime").innerHTML += totalResponseTime.toFixed() + " miliseconds.";
+            valueLength = result.value.length;
+            valueLength += 1;
+            for (let i = 1; i < valueLength; i++){
+                const gridContainer = document.querySelector('.grid-container');
+                const table = document.createElement('table');
+                gridContainer.append(table);
+        
+                table.classList.add("table" + (i));
+                table.id = 'itable';
+                table.innerHTML = "<tr><th>Field</th><th>Data</th></tr>";
+            }
+            valueLength2 = result.value.length;
+            for (let i2 = 0; i2 < valueLength2; i2++){
+                item = result.value[i2];
+                console.log(item);
+                var tablecontainer = document.querySelector('.table' + (i2 += 1));
+                id = item.Location_ID;
+                tablecontainer.innerHTML += "<tr><td>Location ID</td><td>"+id+"</td></tr>";
+                name = item.Location_Name;
+                tablecontainer.innerHTML += "<tr><td>Name</td><td>"+name+"</td></tr>";
+                locationtype = item.Location_Type;
+                tablecontainer.innerHTML += "<tr><td>Location Type</td><td>"+locationtype+"</td></tr>";
+                address = item.Location_Address;
+                tablecontainer.innerHTML += "<tr><td>Address</td><td>"+address+"</td></tr>";
+                city = item.Location_City;
+                tablecontainer.innerHTML += "<tr><td>City</td><td>"+city+"</td></tr>";
+                country = item.Location_Country;
+                tablecontainer.innerHTML += "<tr><td>Country</td><td>"+country+"</td></tr>";
+                postcode = item.Location_Postcode;
+                tablecontainer.innerHTML += "<tr><td>Postcode</td><td>"+postcode+"</td></tr>";
+                email = item.Location_Email;
+                tablecontainer.innerHTML += "<tr><td>Location Email</td><td>"+email+"</td></tr>";
+                phone = item.Location_PhoneNumber;
+                tablecontainer.innerHTML += "<tr><td>LocationPhone Number</td><td>"+phone+"</td></tr>";
+                i2 -=1;
+            }
+        }
+        async function searchAppointments(){
+            var startTime = performance.now();
+            document.getElementById("databaseResponseTime").innerHTML = "Database Response Time: ";
+            document.getElementById(".grid-container").innerHTML="";
+            const pretype = appointmentlocationCheck();
+            console.log(pretype);
+            let type = 0;
+            if (pretype == "Hawthorn Health Center"){
+                type = 1;
+            } else if (pretype == "Prairie Rose Family Practice"){
+                type = 2;
+            } else {
+                type = 3;
+            }
+            console.log(type);
+            const categoryEndpointFilter = type;
+            const endpoint = `/data-api/rest/Appointments?$filter=Location_ID eq `;
+            const response = await fetch(`${endpoint}${categoryEndpointFilter}`);
+            const result = await response.json();
+            //console.table(result.value);
+            var endTime = performance.now();
+            var totalResponseTime = endTime - startTime;
+            //console.log(totalResponseTime);
+            document.getElementById("databaseResponseTime").innerHTML += totalResponseTime.toFixed() + " miliseconds.";
+            valueLength = result.value.length;
+            valueLength += 1;
+            for (let i = 1; i < valueLength; i++){
+                const gridContainer = document.querySelector('.grid-container');
+                const table = document.createElement('table');
+                gridContainer.append(table);
+        
+                table.classList.add("table" + (i));
+                table.id = 'itable';
+                table.innerHTML = "<tr><th>Field</th><th>Data</th></tr>";
+            }
+            valueLength2 = result.value.length;
+            for (let i2 = 0; i2 < valueLength2; i2++){
+                item = result.value[i2];
+                console.log(item);
+                var tablecontainer = document.querySelector('.table' + (i2 += 1));
+                id = item.Appointment_ID;
+                tablecontainer.innerHTML += "<tr><td>Appointment ID</td><td>"+id+"</td></tr>";
+                pid = item.Patient_ID;
+                tablecontainer.innerHTML += "<tr><td>Patient ID</td><td>"+pid+"</td></tr>";
+                lid = item.Location_ID;
+                tablecontainer.innerHTML += "<tr><td>Location ID</td><td>"+lid+"</td></tr>";
+                sid = item.Staff_ID;
+                tablecontainer.innerHTML += "<tr><td>Staff ID</td><td>"+sid+"</td></tr>";
+                notes = item.Appointment_Notes;
+                tablecontainer.innerHTML += "<tr><td>Notes</td><td>"+notes+"</td></tr>";
+                mid = item.Medicine_ID;
+                tablecontainer.innerHTML += "<tr><td>Medicine ID</td><td>"+mid+"</td></tr>";
+                date = item.Appointment_Date;
+                tablecontainer.innerHTML += "<tr><td>Appointment Date</td><td>"+date+"</td></tr>";
+                i2 -= 1;
+            }
+        }
+    </script>
+</body>
+</html>
